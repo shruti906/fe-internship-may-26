@@ -12,11 +12,18 @@ export function SearchInput({ value, onChange, placeholder = 'Search...' }: Sear
   useEffect(() => {
     inputRef.current?.focus()
     const handleKey = (e: KeyboardEvent) => {
+      // '/' focuses the input
       if (e.key === '/' && document.activeElement !== inputRef.current) {
         e.preventDefault()
         inputRef.current?.focus()
       }
+      // 'Escape' blurs the input
       if (e.key === 'Escape') inputRef.current?.blur()
+      // 'Ctrl+K' / 'Cmd+K' focuses the input (common shortcut)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        inputRef.current?.focus()
+      }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
@@ -38,17 +45,23 @@ export function SearchInput({ value, onChange, placeholder = 'Search...' }: Sear
         className="w-full bg-gray-800 text-white placeholder-gray-500 rounded-xl pl-10 pr-10 py-3 text-sm border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
         aria-label="Search items"
       />
-      {value && (
-        <button
-          onClick={() => onChange('')}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white transition-colors"
-          aria-label="Clear search"
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      )}
+      <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-2">
+        {value && (
+          <button
+            onClick={() => onChange('')}
+            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Clear search"
+            title="Clear (Esc)"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+        <div className="text-xs text-gray-500 font-mono pointer-events-none">
+          {value ? '↵' : '⌘K'}
+        </div>
+      </div>
     </div>
   )
 }
